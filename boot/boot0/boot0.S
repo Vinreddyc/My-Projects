@@ -39,6 +39,8 @@
      *
      *  Hint: use the assembly directive .set to assign a symbol to an expression.
      */
+     .set bt0,0x7c00
+     .set bt1,0x7e00
 
 
     /* define the global start symbol, code execution will begin here. */
@@ -53,7 +55,8 @@ start:
      *
      *     Hint: see the cli/sti and cld/std instructions.
      */
-
+     cli
+     cld
 
     /* TASK 3:
      *    - Clear these segment registers (by setting them to zero): %ds, %es, %ss
@@ -64,6 +67,11 @@ start:
      *    Hint 4: These are 16-bit registers so use "w" instruction suffix (e.g. xorw, movw).
      *
      */
+      xorw %ax,%ax
+      movw %ax,%ds
+      movw %ax,%es
+      movw %ax,%ss
+
 
 
     /* TASK 4:
@@ -76,6 +84,9 @@ start:
      * Info 1: We will use this information in boot1.
      * Info 2: The device ID is the ID of the Disk we booted from.
      */
+      xorl %eax,%eax
+      movw %dx,%ax
+      movw %ax,(bt0-4)
 
 
     /* TASK 5:
@@ -102,6 +113,8 @@ start:
      *        - This stack will grow just below the device id we stored in task 4.
      *        - 32-bit code would use %ebp and %esp instead of %bp and %sp.
      */
+    movl $(bt0-4),%ebp
+    movl $(bt0-4),%esp 
 
 
 
@@ -138,7 +151,17 @@ load_boot1:
      *    Hint 6: Use the "int" instruction to trigger an intterupt after all the arguments and registers have been configured.
      *    Hint 7: Use the "jmp" to unconditionally jump.
      */
+   pushl $0x0
+   pushl $0x1
+   pushl $0x7e00
+   pushw $0x3e
+   pushw $0x10
 
+   xorl %eax,%eax
+   movb $0x42,%ah
+   movw %sp,%si
+   int $0x13
+   jmp bt1
 
 
 
