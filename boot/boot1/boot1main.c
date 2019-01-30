@@ -45,7 +45,8 @@ boot1main (uint32_t dev, mbr_t * mbr, bios_smap_t *smap)
 	 */
 	  uint32_t laddr;
           uint32_t retptr;
-          for(int i=0;i<4;i++)
+          int i;
+          for(i=0;i<4;i++)
             {
 	       if(mbr->partition[i].bootable == BOOTABLE_PARTITION)
         	{
@@ -55,7 +56,8 @@ boot1main (uint32_t dev, mbr_t * mbr, bios_smap_t *smap)
                
             }
           
-        
+        if(i>3)
+               panic ("Fail to load kernel.");
         
 
 	/* parse the memory map we extracted from the bios on the assembly side */
