@@ -85,7 +85,7 @@ start:
      * Info 2: The device ID is the ID of the Disk we booted from.
      */
       xorl %eax,%eax
-      movw %dx,%ax
+      movb %dl,%al
       movw %ax,(bt0-4)
 
 
@@ -113,8 +113,8 @@ start:
      *        - This stack will grow just below the device id we stored in task 4.
      *        - 32-bit code would use %ebp and %esp instead of %bp and %sp.
      */
-    movl $(bt0-4),%ebp
-    movl $(bt0-4),%esp 
+    movw $(bt0-4),%bp
+    movw $(bt0-4),%sp 
 
 
 
