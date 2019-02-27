@@ -37,9 +37,10 @@ void container_init(unsigned int mbi_addr)
 {
   unsigned int real_quota;
   // TODO: define your local variables here.
-
-  pmem_init(mbi_addr);
-  real_quota = 0;
+  unsigned int avb_quota=0;
+  unsigned int i;
+  unsigned int VM_low_pi=0x40000000/4096;
+  unsigned int VM_hi_pi=0xF0000000/4096; 
 
   /** TASK 1:
     * * Compute the available quota and store it into the variable real_quota.
@@ -49,6 +50,16 @@ void container_init(unsigned int mbi_addr)
     *  - We have already implemented functions that deal with AT data-structure in MATIntro layer.
     *    (see import.h for available functions)
     */
+  
+  pmem_init(mbi_addr);
+  real_quota = 0;
+  for(i=VM_low_pi;i<VM_hi_pi;i++)
+  {
+     if(at_is_norm(i)==1 && at_is_allocated(i)==0)
+       avb_quota=avb_quota+1;
+  }
+  real_quota=avb_quota;
+
 
   KERN_DEBUG("\nreal quota: %d\n\n", real_quota);
 
@@ -67,6 +78,7 @@ void container_init(unsigned int mbi_addr)
 unsigned int container_get_parent(unsigned int id)
 {
   // TODO
+  return CONTAINER[id].parent;
   return 0;
 }
 
@@ -77,6 +89,7 @@ unsigned int container_get_parent(unsigned int id)
 unsigned int container_get_nchildren(unsigned int id)
 {
   // TODO
+  return CONTAINER[id].nchildren;
   return 0;
 }
 
@@ -87,6 +100,7 @@ unsigned int container_get_nchildren(unsigned int id)
 unsigned int container_get_quota(unsigned int id)
 {
   // TODO
+  return CONTAINER[id].quota;
   return 0;
 }
 
@@ -97,6 +111,7 @@ unsigned int container_get_quota(unsigned int id)
 unsigned int container_get_usage(unsigned int id)
 {
   // TODO
+  return CONTAINER[id].usage;
   return 0;
 }
 
@@ -109,7 +124,12 @@ unsigned int container_get_usage(unsigned int id)
 unsigned int container_can_consume(unsigned int id, unsigned int n)
 {
   // TODO
-  return 0;
+  unsigned int can_use;
+  can_use=CONTAINER[id].quota-CONTAINER[id].usage;
+  if(can_use>n)
+  	return 1;
+  else
+  	return 0;
 }
 
 /**
@@ -133,7 +153,14 @@ unsigned int container_split(unsigned int id, unsigned int quota)
     * Hint 1: Read about the parent/child relationship maintained in you kernel 
     *         (available at the top of this page and handout)
     */
+  CONTAINER[id].nchildren++;                          //child arrived for a process
+  CONTAINER[id].usage = CONTAINER[id].usage + quota;  // updating total usage by children and parent for container
 
+  CONTAINER[child].quota = quota;
+  CONTAINER[child].usage = 0;
+  CONTAINER[child].parent = id;
+  CONTAINER[child].nchildren = 0;
+  CONTAINER[child].used = 1;
   return child;
 }
 
@@ -148,7 +175,15 @@ unsigned int container_alloc(unsigned int id)
   /*
    * TODO: implement the function here.
    */
-  return 0;
+  unsigned int pg_index;
+  if(CONTAINER[id].usage<CONTAINER[id].quota)
+  {
+  	pg_index= palloc();
+  	CONTAINER[id].usage++; 
+  	return pg_index;
+  }
+  else
+  	return 0;
 }
 
 /** TASK 9:
@@ -160,4 +195,6 @@ unsigned int container_alloc(unsigned int id)
 void container_free(unsigned int id, unsigned int page_index)
 {
   // TODO
+  CONTAINER[id].usage--;
+  pfree(page_index);
 }

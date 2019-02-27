@@ -19,10 +19,14 @@
 void
 pmem_init(unsigned int mbi_addr)
 {
-  unsigned int nps;
+  unsigned int nps=0;
 
   // TODO: Define your local variables here.
-
+  unsigned int i=0,lo_idx=0,hi_idx=0,k,j;
+  unsigned int rowcnt;
+  unsigned int phypgcnt;
+  unsigned int pg_st_addr,pg_end_addr;
+  unsigned int range_end,range_start;
   //Calls the lower layer initializatin primitives.
   //The parameter mbi_addr shell not be used in the further code.
 	devinit(mbi_addr);
@@ -34,10 +38,25 @@ pmem_init(unsigned int mbi_addr)
     * Hint 2: Think of it as the highest address possible in the ranges of the memory map table,
     *         divided by the page size plus 1.
     */
+    rowcnt=get_size();
+    //dprintf("getsize is:****************%d\n",get_size()); 
+    while(i<rowcnt)
+    {
+      if(nps<get_mms(i)+get_mml(i))
+      //dprintf("getmms and getmml are*************:%lu          %lu\n",get_mms(i),get_mml(i));
+      nps=get_mms(i)+get_mml(i);     // maximum value
+      //dprintf("nps is***************:%lu\n",nps);
+      i++;                                                             //extracting the highest address of the last range.
+    }
+    //dprintf("highest address is is *******************%lu\n",(nps));
+    phypgcnt=(nps/PAGESIZE)+1;//physical page count
+    nps=phypgcnt;
+    //dprintf("final1 nps is *******************%lu\n",(nps));      
+
   // TODO
 
 	set_nps(nps); // Setting the value computed above to NUM_PAGES.
-
+    
   /** TASK 2:
     * Initialization of the physical allocation table (AT).
     *
@@ -64,6 +83,53 @@ pmem_init(unsigned int mbi_addr)
     *    You should still set the permission of those pages in allocation table to 0.
     */
   // TODO
+     for(i=0;i<VM_USERLO_PI;i++)
+     {   
+         at_set_perm(i,1);                                                    //setting permissions for the kernel portions
+     }
+     for(i=VM_USERHI_PI;i<nps;i++)
+     {
+         at_set_perm(i,1);
+     }
+     
+     //for(i=VM_USERLO_PI;i<VM_USERHI_PI;i++)
+     //nps_start=(0x40000000/PAGESIZE);             VM_USERLO
+     //nps_end=(0x80000000/PAGESIZE)-1;             Hex value of usable range
+     //dprintf("nps_start*************:%lu\n",nps_start);
+     //dprintf("nps_start*************:%lu\n",nps_end);
+     //for(i=nps_start+1;i<nps_end;i++)
+    for(k=0;k<get_size();k++)
+    {
+         //dprintf("is_usable %d value********* %d\n",k,is_usable(k));
+         if(VM_USERLO >= get_mms(k) && VM_USERLO <= get_mms(k)+get_mml(k))
+         	lo_idx=k;
+         if(VM_USERHI >= get_mms(k) && VM_USERHI <= get_mms(k)+get_mml(k))                   //fetching the range indexes for which VM_USERLO and VM_USERHI belong.
+                hi_idx=k;
+    }
+     for(i=VM_USERLO_PI;i<VM_USERHI_PI;i++)
+     {
+       
+	   pg_st_addr=i*4096;
+           pg_end_addr=i*4096+4096;
+           j=lo_idx;
+           do
+           {
+            range_start=get_mms(j);
+            range_end = get_mms(j)+get_mml(j);
+            if(pg_st_addr >= range_start  &&  pg_end_addr <= range_end)                  //checking whether the page fits between the start and end ranges.
+            {
+               if(is_usable(j)==1)
+               at_set_perm(i,2);                                                         //setting permission to normal usage.
+               break;
+            }
+            else
+            at_set_perm(i,0);                                                            //setting the bios permission for the gaps.
+            j++;
+           }
+           while(j<=hi_idx);
+         
+       
+     }
 }
 
 

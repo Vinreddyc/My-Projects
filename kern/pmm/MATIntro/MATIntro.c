@@ -79,7 +79,10 @@ unsigned int
 at_is_norm(unsigned int page_index)
 {
   //TODO
-  return 0;
+    if(AT[page_index].perm > 1)
+    return 1;
+    else
+    return 0;
 }
 
 /** TASK 2:
@@ -92,6 +95,9 @@ void
 at_set_perm(unsigned int page_index, unsigned int norm_val)
 {
   //TODO
+    AT[page_index].perm=norm_val;
+    AT[page_index].allocated=0;
+  
 }
 
 /** TASK 3: 
@@ -102,7 +108,10 @@ unsigned int
 at_is_allocated(unsigned int page_index)
 {
   //TODO
-  return 0;
+    if(AT[page_index].allocated > 0)
+    return 1;
+    else
+    return 0;
 }
 
 /** TASK 4:
@@ -113,4 +122,7 @@ void
 at_set_allocated(unsigned int page_index, unsigned int allocated)
 {
   //TODO
+    AT[page_index].allocated=allocated;
+  
+  
 }

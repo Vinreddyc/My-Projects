@@ -21,6 +21,17 @@ unsigned int
 palloc()
 {
   // TODO
+  unsigned int i;
+  unsigned int VM_low_pi=0x40000000/4096;
+  unsigned int VM_hi_pi=0xF0000000/4096;            //from the previous file pmem_init
+  for(i=VM_low_pi;i<VM_hi_pi;i++)           //normal pages range
+  {
+    if(at_is_allocated(i)==0 && at_is_norm(i)==1)
+    {
+      at_set_allocated(i,1);
+      return i;                                        //setting page permissions as allocated.
+     }
+  }
   return 0;
 } 
 
@@ -37,4 +48,6 @@ void
 pfree(unsigned int pfree_index)
 {
   // TODO
+     at_is_allocated(pfree_index);
+     at_set_allocated(pfree_index,0);             
 }
