@@ -109,8 +109,8 @@ pmem_init(unsigned int mbi_addr)
      for(i=VM_USERLO_PI;i<VM_USERHI_PI;i++)
      {
        
-	   pg_st_addr=i*4096;
-           pg_end_addr=i*4096+4096;
+	   pg_st_addr=i*PAGESIZE;
+           pg_end_addr=i*PAGESIZE+PAGESIZE;
            j=lo_idx;
            do
            {
