@@ -118,12 +118,11 @@ void idptbl_init(unsigned int mbi_adr)
     // TODO: define your local variables here.
     //
 
-    unsigned int pagesize=4096;
     //unsigned int IDPTbl[1024][1024];
     unsigned int PT_PERM_PTG = (PTE_P | PTE_W | PTE_G);
     unsigned int PT_REST = (PTE_P | PTE_W);
-    unsigned int VM_LOPI = 0x40000000/pagesize; //user low page index
-    unsigned int VM_HIPI = 0xF0000000/pagesize; //user high page index
+    unsigned int VM_LOPI = 0x40000000/PAGESIZE; //user low page index
+    unsigned int VM_HIPI = 0xF0000000/PAGESIZE; //user high page index
     unsigned int pdir_idx,ptab_idx,addrind=0;
 								
     container_init(mbi_adr);

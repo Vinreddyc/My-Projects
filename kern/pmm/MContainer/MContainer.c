@@ -39,8 +39,8 @@ void container_init(unsigned int mbi_addr)
   // TODO: define your local variables here.
   unsigned int avb_quota=0;
   unsigned int i;
-  unsigned int VM_low_pi=0x40000000/4096;
-  unsigned int VM_hi_pi=0xF0000000/4096; 
+  unsigned int VM_low_pi=0x40000000/PAGESIZE;
+  unsigned int VM_hi_pi=0xF0000000/PAGESIZE; 
 
   /** TASK 1:
     * * Compute the available quota and store it into the variable real_quota.

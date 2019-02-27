@@ -14,9 +14,9 @@
 void pdir_init(unsigned int mbi_adr)
 {
     // TODO: define your local variables here.
-    unsigned int proc_idx,pdir_idx,pagesize=4096;//addr
-    unsigned int VM_USERLO = 0x40000000/pagesize;
-    unsigned int VM_USERHI = 0xF0000000/pagesize;
+    unsigned int proc_idx,pdir_idx;//addr
+    unsigned int VM_USERLO = 0x40000000/PAGESIZE;
+    unsigned int VM_USERHI = 0xF0000000/PAGESIZE;
     idptbl_init(mbi_adr);
 
     // TODO

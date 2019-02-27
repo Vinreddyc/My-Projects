@@ -80,8 +80,8 @@ void set_pdir_entry(unsigned int proc_index, unsigned int pde_index, unsigned in
 {
     // TODO
        unsigned int perm_enable;
-       unsigned int pagesize = 4096;
-       unsigned int addr = page_index*pagesize;         // we get the address by multiplying it with pagesize
+       //unsigned int pagesize = 4096;
+       unsigned int addr = page_index*PAGESIZE;         // we get the address by multiplying it with pagesize
        perm_enable=addr | PT_PERM_PTU;                  // setting permissions
        PDirPool[proc_index][pde_index]=(char *)(perm_enable);
       
@@ -142,13 +142,13 @@ unsigned int get_ptbl_entry(unsigned int proc_index, unsigned int pde_index, uns
 void set_ptbl_entry(unsigned int proc_index, unsigned int pde_index, unsigned int pte_index, unsigned int page_index, unsigned int perm)
 {   
     // TODO
-       unsigned int pagesize=4096;
+       //unsigned int pagesize=4096;
        unsigned int *pg_entry;
        pte_index=pte_index*4;
        unsigned int entry_compute;
        entry_compute=((int)((char *)PDirPool[proc_index][pde_index])) & 0xfffffff8; // masking out the permission info, last 3 bits are permissions.
        pg_entry =(int *) (entry_compute+(pte_index));
-       *(unsigned int *)pg_entry = page_index*pagesize|perm;
+       *(unsigned int *)pg_entry = page_index*PAGESIZE|perm;
        
 }   
 
@@ -172,8 +172,8 @@ void set_ptbl_entry(unsigned int proc_index, unsigned int pde_index, unsigned in
 void set_ptbl_entry_identity(unsigned int pde_index, unsigned int pte_index, unsigned int perm)
 {
     // TODO
-       unsigned int pagesize=4096;
-       IDPTbl[pde_index][pte_index] = (pde_index*1024+pte_index)*pagesize | perm;   //each entry is a page, so pagesize
+       //unsigned int pagesize=4096;
+       IDPTbl[pde_index][pte_index] = (pde_index*1024+pte_index)*PAGESIZE | perm;   //each entry is a page, so pagesize
        
        
 }
