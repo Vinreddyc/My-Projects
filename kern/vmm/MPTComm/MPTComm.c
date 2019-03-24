@@ -14,10 +14,27 @@
 void pdir_init(unsigned int mbi_adr)
 {
     // TODO: define your local variables here.
-
+    unsigned int proc_idx,pdir_idx;//addr
+    unsigned int VM_USERLO = 0x40000000/PAGESIZE;
+    unsigned int VM_USERHI = 0xF0000000/PAGESIZE;
     idptbl_init(mbi_adr);
 
     // TODO
+    for(proc_idx=0;proc_idx<NUM_IDS;proc_idx++)
+    {
+      for(pdir_idx=0;pdir_idx<1024;pdir_idx++)
+       {
+        //addr=(i*1024+j);
+        	if(pdir_idx<VM_USERLO>>10)                              //making the VM index compatible with array indexes of IDPTbl.
+        	set_pdir_entry_identity(proc_idx,pdir_idx);
+
+        	else if (pdir_idx>=VM_USERHI>>10)
+        	set_pdir_entry_identity(proc_idx,pdir_idx);
+
+        	else
+        	rmv_pdir_entry(proc_idx,pdir_idx);
+       }
+    }
 }
 
 /** TASK 2:
@@ -30,7 +47,22 @@ void pdir_init(unsigned int mbi_adr)
 unsigned int alloc_ptbl(unsigned int proc_index, unsigned int vadr)
 {
   // TODO
-  return 0;
+     unsigned int i;
+     unsigned int DIR_MASK = 0xffc00000;
+     unsigned int pdir_idx = (vadr & DIR_MASK) >> 22;
+     unsigned int pg_idx = container_alloc(proc_index);
+     if(pg_idx!=0)
+     {
+     	set_pdir_entry_by_va(proc_index,vadr,pg_idx);
+     	for(i=0;i<1024;i++)
+     	{
+         	rmv_ptbl_entry(proc_index,pdir_idx,i);                       //removing the page table entries.
+     	}
+     
+        return pg_idx;
+     }
+     else 
+     return 0;
 }
 
 /** TASK 3:
@@ -44,4 +76,8 @@ unsigned int alloc_ptbl(unsigned int proc_index, unsigned int vadr)
 void free_ptbl(unsigned int proc_index, unsigned int vadr)
 {
   // TODO
+     unsigned int DIR_MASK = 0xffc00000;
+     unsigned int dir_idx = (vadr & DIR_MASK) >> 12;            //finding pde to corresponding vadr
+     rmv_pdir_entry_by_va(proc_index,vadr);
+     container_free(proc_index,dir_idx);
 }

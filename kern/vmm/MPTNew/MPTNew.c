@@ -16,6 +16,19 @@
 unsigned int alloc_page (unsigned int proc_index, unsigned int vaddr, unsigned int perm)
 {
 	// TODO
+        unsigned int p,phy_pg_idx;
+        p=container_alloc(proc_index);
+        if(p!=0)
+        {
+        phy_pg_idx = map_page(proc_index,vaddr,p,perm);
+
+        if(phy_pg_idx==0)
+           return MagicNumber;                                 //checking if there is a valid physical page index.
+
+        return phy_pg_idx;
+        }
+        else
+        return MagicNumber;
 	return 0;
 }
 

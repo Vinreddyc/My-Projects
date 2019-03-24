@@ -10,4 +10,3 @@ void rmv_ptbl_entry_by_va(unsigned int, unsigned int);
 void idptbl_init(unsigned int);
 
 #endif
-
