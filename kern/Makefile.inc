@@ -2,6 +2,7 @@
 
 KERN_DIR	:= kern
 KERN_OBJDIR	:= $(OBJDIR)/kern
+SAMPLE_KERN_DIR  := $(SAMPLEDIR)/kern
 
 OBJDIRS		+= $(KERN_OBJDIR)
 

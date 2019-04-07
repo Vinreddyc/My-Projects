@@ -132,6 +132,7 @@ void interrupt_handler (void)
       default:
         default_intr_handler();
   }
+}
 
 /** TASK 1:
   * * Handle all traps.

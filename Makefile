@@ -35,7 +35,7 @@ OBJDIR		:= $(TOP)/obj
 UTILSDIR	:= $(TOP)/misc
 TESTDIR		:= $(TOP)/test
 OBJDIRS		:=
-SAMPLEDIR       := $(TOP)/samples
+SAMPLEDIR       := $(TOP)/.samples
 
 # Compiler and Linker
 CC		:= $(GCCPREFIX)gcc

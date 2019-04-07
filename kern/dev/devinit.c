@@ -21,15 +21,14 @@ devinit (uintptr_t mbi_addr)
 	KERN_DEBUG("cons initialized.\n");
 	KERN_DEBUG("devinit mbi_adr: %d\n", mbi_addr);
 
-  tsc_init();
+  	tsc_init();
 
 	intr_init();
 
-  /* enable interrupts */
-  intr_enable (IRQ_TIMER);
-  intr_enable (IRQ_KBD);
-  intr_enable (IRQ_SERIAL13);
+  	/* enable interrupts */
+  	intr_enable (IRQ_TIMER);
+  	intr_enable (IRQ_KBD);
+  	intr_enable (IRQ_SERIAL13);
 
 	pmmap_init (mbi_addr);
-
 }
