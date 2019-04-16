@@ -56,7 +56,7 @@ void sys_puts(void)
 extern uint8_t _binary___obj_user_pingpong_ping_start[];
 extern uint8_t _binary___obj_user_pingpong_pong_start[];
 extern uint8_t _binary___obj_user_pingpong_ding_start[];
-extern uint8_t _binary___obj_user_fork_forker_start[];    // Addition for forker.
+extern uint8_t _binary___obj_user_fork_fork_start[];    // Addition for forker.
 
 /** TASK 1:
   * * Spawn a new child process.
