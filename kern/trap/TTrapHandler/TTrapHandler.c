@@ -158,7 +158,15 @@ void interrupt_handler (void)
 void trap (tf_t *tf)
 {
     // TODO
-
+       unsigned int cur_id = get_curid();
+       uctx_pool[cur_id] = *tf;
+       set_pdir_base(0);
+       if(tf->trapno >= T_DIVIDE && tf->trapno <= T_SECEV)
+       exception_handler();
+       else if(tf->trapno >= T_IRQ0 + IRQ_TIMER && tf->trapno <= T_IRQ0 + IRQ_IDE2)
+       interrupt_handler();
+       else if(tf->trapno == T_SYSCALL)
+       syscall_dispatch();
 	  // Trap handled: call proc_start_user() to initiate return from trap.
-    proc_start_user (); 
+    proc_start_user ();  
 }

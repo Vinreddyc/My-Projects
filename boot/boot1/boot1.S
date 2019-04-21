@@ -39,6 +39,8 @@
      *
      *  Hint: should be the same as boot0.
      */
+     .set   bt0,0x7c00
+     .set   bt1,0x7e00
 
 
 
@@ -62,6 +64,8 @@ start:
      *
      *     Hint: see the cli/sti and cld/std instructions.
      */
+     cli
+     cld
 
 
     /* enable A20
@@ -89,7 +93,8 @@ seta20.2:
      *  Hint 2: We will define a startup message below.
      *  Hint 3: putstr needs a reference to the string loaded into the %si register.
      */
-
+     movw    $STARTUP_MSG, %si
+     call    putstr
 
     /*
      * detect the physical memory map
@@ -139,6 +144,7 @@ switch_prot:
      *  Hint 2: Use the GDT descriptor (a wrapper for the GDT, also defined at the end of this file).
      *  Hint 3: If you need to learn about a specific instruction in x86 see chapter 17 in the 80386 Programmer's Manual.
      */
+     lgdt gdtdesc
 
 
     /* TASK 5:
@@ -159,6 +165,10 @@ switch_prot:
      *      - The definition of the GDT is below.
      *      - Even though we aren't jumping anywhere significant, the ljmp excutes the CPU state switch.
      */
+     movl   %cr0,%eax
+     or    $1,%al
+     movl   %eax,%cr0
+     ljmp  $PROT_MODE_CSEG,$protcseg
 
     /* assemble the following instructions in 32-bit mode */
     .code32
@@ -171,7 +181,12 @@ protcseg:
      * Hint 1: PROT_MODE_DSEG should be an immediate value.
      * Hint 2: These segmentation regsiters are not general purpose registers. You must move from a temporary register.
      */
-
+     movl    $PROT_MODE_DSEG,%ecx
+     movw    %cx,%ds
+     movw    %cx,%es   
+     movw    %cx,%fs
+     movw    %cx,%gs
+     movw    %cx,%ss
 
     /* TASK 7:
      * - jump to the C part (boot1main)
@@ -181,6 +196,10 @@ protcseg:
      * Hint 3: Remember that the device id (dev) is stored at BOOT0-4. Also remember that we want to pass the device ID itself NOT its address.
      * Hint 4: After pushing all the arguments, call boot1main
      */
+     push $smap
+     push $0x7c00
+     push (bt0-4)
+     call boot1main
 
 
 

@@ -37,6 +37,7 @@
   * - R/W = Read / Write bit
   * - P   = Present bit
   */
+
 char * PDirPool[NUM_IDS][1024] gcc_aligned(PAGESIZE);
 
 /** * VMM Data Structure: IDPTbl
@@ -54,6 +55,8 @@ unsigned int IDPTbl[1024][1024] gcc_aligned(PAGESIZE);
 void set_pdir_base(unsigned int index)
 {
     // TODO
+       set_cr3(PDirPool[index]);                 //setting the CR3 to base address.
+    
 }
 
 /** TASK 2:
@@ -63,7 +66,8 @@ void set_pdir_base(unsigned int index)
 unsigned int get_pdir_entry(unsigned int proc_index, unsigned int pde_index)
 {
     // TODO
-    return 0;
+       return (int)PDirPool[proc_index][pde_index];            //returns the PDirPool Entry
+       return 0;
 }   
 
 /** TASK 3:
@@ -75,6 +79,12 @@ unsigned int get_pdir_entry(unsigned int proc_index, unsigned int pde_index)
 void set_pdir_entry(unsigned int proc_index, unsigned int pde_index, unsigned int page_index)
 {
     // TODO
+       unsigned int perm_enable;
+       //unsigned int pagesize = 4096;
+       unsigned int addr = page_index*PAGESIZE;         // we get the address by multiplying it with pagesize
+       perm_enable=addr | PT_PERM_PTU;                  // setting permissions
+       PDirPool[proc_index][pde_index]=(char *)(perm_enable);
+      
 }   
 
 /** TASK 4:
@@ -87,6 +97,9 @@ void set_pdir_entry(unsigned int proc_index, unsigned int pde_index, unsigned in
 void set_pdir_entry_identity(unsigned int proc_index, unsigned int pde_index)
 {   
     // TODO
+       unsigned int set_IDPTbl=(int)IDPTbl[pde_index]|PT_PERM_PTU;
+       PDirPool[proc_index][pde_index]=(char *)set_IDPTbl;
+       
 }   
 
 /** TASK 5:
@@ -97,6 +110,7 @@ void set_pdir_entry_identity(unsigned int proc_index, unsigned int pde_index)
 void rmv_pdir_entry(unsigned int proc_index, unsigned int pde_index)
 {
     // TODO
+       PDirPool[proc_index][pde_index]=(char *)PT_PERM_UP;
 }   
 
 /** TASK 6:
@@ -111,7 +125,13 @@ void rmv_pdir_entry(unsigned int proc_index, unsigned int pde_index)
 unsigned int get_ptbl_entry(unsigned int proc_index, unsigned int pde_index, unsigned int pte_index)
 {   
     // TODO
-    return 0;
+       unsigned int *pg_entry;
+       unsigned int entry_compute;
+       pte_index=pte_index*4;
+       entry_compute=((int)((char *)PDirPool[proc_index][pde_index])) & 0xfffffff8;  // masking out the permission info, last 3 bits are permissions.
+       pg_entry =(int *) (entry_compute + (pte_index));
+       return *pg_entry; 
+       return 0;
 }
 
 /** TASK 7:
@@ -122,6 +142,14 @@ unsigned int get_ptbl_entry(unsigned int proc_index, unsigned int pde_index, uns
 void set_ptbl_entry(unsigned int proc_index, unsigned int pde_index, unsigned int pte_index, unsigned int page_index, unsigned int perm)
 {   
     // TODO
+       //unsigned int pagesize=4096;
+       unsigned int *pg_entry;
+       pte_index=pte_index*4;
+       unsigned int entry_compute;
+       entry_compute=((int)((char *)PDirPool[proc_index][pde_index])) & 0xfffffff8; // masking out the permission info, last 3 bits are permissions.
+       pg_entry =(int *) (entry_compute+(pte_index));
+       *(unsigned int *)pg_entry = page_index*PAGESIZE|perm;
+       
 }   
 
 /** TASK 8:
@@ -144,6 +172,10 @@ void set_ptbl_entry(unsigned int proc_index, unsigned int pde_index, unsigned in
 void set_ptbl_entry_identity(unsigned int pde_index, unsigned int pte_index, unsigned int perm)
 {
     // TODO
+       //unsigned int pagesize=4096;
+       IDPTbl[pde_index][pte_index] = (pde_index*1024+pte_index)*PAGESIZE | perm;   //each entry is a page, so pagesize
+       
+       
 }
 
 /** TASK 9:
@@ -154,4 +186,12 @@ void set_ptbl_entry_identity(unsigned int pde_index, unsigned int pte_index, uns
 void rmv_ptbl_entry(unsigned int proc_index, unsigned int pde_index, unsigned int pte_index)
 {
     // TODO
+       unsigned int *pg_entry;
+       unsigned int entry_compute;                                                  //going to the particular entry using a pointer and setting the value to 0.
+       pte_index=pte_index*4;
+       entry_compute=((int)((char *)(PDirPool[proc_index][pde_index])) & 0xfffffff8) | pte_index;
+       pg_entry =(int *) entry_compute;
+       *pg_entry=0;
+       
+       
 }

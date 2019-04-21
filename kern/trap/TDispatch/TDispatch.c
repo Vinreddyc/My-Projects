@@ -12,4 +12,18 @@
 void syscall_dispatch(void)
 {
 	// TODO
+        unsigned int syscall_num = syscall_get_arg1();
+        switch(syscall_num){
+        case SYS_puts:
+                      sys_puts();
+                      break;
+        case SYS_spawn:
+                      sys_spawn();
+                      break;
+        case SYS_yield:
+                      sys_yield();
+                      break;
+        default:
+             syscall_set_errno(E_INVAL_CALLNR);
+        }
 }

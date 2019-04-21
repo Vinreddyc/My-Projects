@@ -87,6 +87,57 @@ extern uint8_t _binary___obj_user_fork_fork_start[];    // Addition for forker.
 void sys_spawn(void)
 {
   // TODO
+     
+     unsigned int new_proc;
+     unsigned int elf_ld;
+     unsigned int exec = syscall_get_arg2();
+     unsigned int quota = syscall_get_arg3();
+     unsigned int elf_id = exec;
+     
+     
+     switch(elf_id){
+     case 1:
+            elf_ld = (unsigned int)_binary___obj_user_pingpong_ping_start;
+            break;
+     case 2:
+            elf_ld = (unsigned int)_binary___obj_user_pingpong_pong_start;
+            break;
+     case 3: 
+            elf_ld = (unsigned int)_binary___obj_user_pingpong_ding_start;
+            break;
+     default:
+            syscall_set_retval1(NUM_IDS);
+            syscall_set_errno(E_INVAL_PID);
+            return;
+      }
+     /*
+     if(elf_id == 1 || elf_id == 2 || elf_id == 3)
+     {
+     	if(elf_id == 1)
+     	{
+        	elf_ld = (void *)_binary___obj_user_pingpong_ping_start;
+     	}
+     	else if(elf_id == 2)
+     	{
+        	elf_ld = (void *)_binary___obj_user_pingpong_pong_start;
+     	}
+     	else if(elf_id == 3)
+     	{
+        	elf_ld = (void *)_binary___obj_user_pingpong_ding_start;
+     	}
+     */
+     new_proc = proc_create((void *)elf_ld,quota);
+     syscall_set_errno(E_SUCC);
+     syscall_set_retval1(new_proc);
+     /*}
+     else 
+     {
+        syscall_set_retval1(NUM_IDS);
+        syscall_set_errno(E_INVAL_PID);
+        return;
+     }
+     */
+     
 }
 
 /** TASK 2:
@@ -102,4 +153,6 @@ void sys_spawn(void)
 void sys_yield(void)
 {
   // TODO
+     thread_yield();
+     syscall_set_errno(E_SUCC);
 }

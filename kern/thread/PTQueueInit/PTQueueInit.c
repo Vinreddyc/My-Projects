@@ -11,10 +11,11 @@
 void tqueue_init(unsigned int mbi_addr)
 {
   // TODO: define your local variables here.
-
-	tcb_init(mbi_addr);
-
+     unsigned int i;
   // TODO
+     tcb_init(mbi_addr);
+     for(i=0;i<NUM_IDS+1;i++)
+     tqueue_init_at_id(i);
 }
 
 /** TASK 2:
@@ -39,6 +40,23 @@ void tqueue_init(unsigned int mbi_addr)
 void tqueue_enqueue(unsigned int chid, unsigned int pid)
 {
   // TODO
+     unsigned int cur_tail_val = tqueue_get_tail(chid);
+     if(cur_tail_val == NUM_IDS)
+     {
+        tqueue_set_head(chid,pid);
+        tqueue_set_tail(chid,pid);
+        tcb_set_prev(pid,NUM_IDS);
+        tcb_set_next(pid,NUM_IDS);
+      }
+     else
+     {
+        tqueue_set_tail(chid,pid);
+        tcb_set_next(cur_tail_val,pid);
+        tcb_set_prev(pid,cur_tail_val);
+        tcb_set_next(pid,NUM_IDS);      
+     }
+    
+     
 }
 
 /** TASK 3:
@@ -58,6 +76,23 @@ void tqueue_enqueue(unsigned int chid, unsigned int pid)
 unsigned int tqueue_dequeue(unsigned int chid)
 {
   // TODO
+  unsigned int cur_head_val = tqueue_get_head(chid);
+  unsigned int new_head_val = tcb_get_next(cur_head_val);
+  if(cur_head_val == NUM_IDS)
+  {
+     tqueue_set_head(chid,NUM_IDS);
+     tqueue_set_tail(chid,NUM_IDS);
+     tcb_set_prev(cur_head_val,NUM_IDS);
+     tcb_set_next(cur_head_val,NUM_IDS);
+  }
+  else
+  {
+     tqueue_set_head(chid,new_head_val);
+     tcb_set_prev(new_head_val,NUM_IDS);
+     tcb_set_prev(cur_head_val,NUM_IDS);
+     tcb_set_next(cur_head_val,NUM_IDS);
+  }
+  return cur_head_val;  
   return 0;
 }
 
@@ -76,4 +111,36 @@ unsigned int tqueue_dequeue(unsigned int chid)
 void tqueue_remove(unsigned int chid, unsigned int pid)
 {
   // TODO
+     if(tcb_get_prev(pid) == NUM_IDS && tcb_get_next(pid) == NUM_IDS)
+     {
+       tqueue_set_head(chid,NUM_IDS);
+       tqueue_set_tail(chid,NUM_IDS);
+     }
+     else if(tqueue_get_head(chid) == pid)
+     {
+       unsigned int nxt_thr = tcb_get_next(pid);
+       tqueue_set_head(chid,nxt_thr);
+       tcb_set_prev(nxt_thr,NUM_IDS);
+       tcb_set_next(pid,NUM_IDS);
+       tcb_set_prev(pid,NUM_IDS);
+     }
+     else if(tqueue_get_tail(chid) == pid)
+     {
+       unsigned int prev_thr = tcb_get_prev(pid);
+       tqueue_set_tail(chid,prev_thr);
+       tcb_set_next(prev_thr,NUM_IDS);
+       tcb_set_prev(pid,NUM_IDS);
+       tcb_set_next(pid,NUM_IDS);
+     }
+     else
+     {
+       unsigned int mid_prev = tcb_get_prev(pid);
+       unsigned int mid_next = tcb_get_next(pid);
+       tcb_set_prev(pid,NUM_IDS);
+       tcb_set_next(pid,NUM_IDS);
+       tcb_set_next(mid_prev,mid_next);
+       tcb_set_prev(mid_next,mid_prev);
+     }
+
+       
 }

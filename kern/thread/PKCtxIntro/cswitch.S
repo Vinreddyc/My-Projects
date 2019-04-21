@@ -37,7 +37,13 @@ cswitch:
 
 	  *  - The saved eip in this data-structure should point to the return address of this function.
 	  */
-
+	movl     %esp,0(%eax)
+        movl     %edi,4(%eax)
+        movl     %esi,8(%eax)
+        movl     %ebx,12(%eax)
+        movl     %ebp,16(%eax)
+        movl     0(%esp),%ecx
+        movl     %ecx,20(%eax)
 
 	/** TASK 2:
 	  *  * Load the new kernel context
@@ -52,5 +58,13 @@ cswitch:
 	/**
 	  * The return value is stored in eax. Returns 0.
 	  */
+        movl    0(%edx),%esp
+        movl    4(%edx),%edi
+        movl    8(%edx),%esi
+        movl    12(%edx),%ebx
+        movl    16(%edx),%ebp
+        movl    20(%edx),%ecx
+        movl    %ecx,0(%esp)
 	xor     %eax, %eax
 	ret
+	

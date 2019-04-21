@@ -12,10 +12,17 @@
 void pdir_init_kern(unsigned int mbi_adr)
 {
     // TODO: define your local variables here.
-
+    unsigned int VM_LOPI = 0x40000000/PAGESIZE; //user low page index
+    unsigned int VM_HIPI = 0xF0000000/PAGESIZE; //user high page index
     pdir_init(mbi_adr);
-    
+    unsigned int i,idx;
     //TODO
+    for(i=VM_LOPI;i<VM_HIPI;i++)        // others indexes are set in the idptbl_init.
+    {
+     	idx=i>>10; 
+        set_pdir_entry_identity(0,idx);  //for process 0.
+    }
+   
 }
 
 /** TASK 2:
@@ -34,7 +41,34 @@ void pdir_init_kern(unsigned int mbi_adr)
 unsigned int map_page(unsigned int proc_index, unsigned int vadr, unsigned int page_index, unsigned int perm)
 {   
   // TODO
+     unsigned int pde = get_pdir_entry_by_va(proc_index,vadr);
+     unsigned int l,pde_idx,pde_idx1,pde1;
+     unsigned int set_perm=pde;
+   
+     if(set_perm==0)
+     {
+         l=alloc_ptbl(proc_index,vadr);
+
+         if(l==0)
+         return MagicNumber;
+
+         pde1 = get_pdir_entry_by_va(proc_index,vadr);
+         if((pde1)!=0)                                                //checking if the new pde is valid.
+         {
+           set_ptbl_entry_by_va(proc_index,vadr,page_index,perm);
+           pde_idx1=pde1/PAGESIZE;
+           return pde_idx1;
+         }
+         else 
+           return MagicNumber;
+      }
+      
+      pde_idx=pde/PAGESIZE;
+      set_ptbl_entry_by_va(proc_index,vadr,page_index,perm);
+      return pde_idx;
+    
   return 0;
+ 
 }
 
 /** TASK 3:
@@ -48,5 +82,12 @@ unsigned int map_page(unsigned int proc_index, unsigned int vadr, unsigned int p
 unsigned int unmap_page(unsigned int proc_index, unsigned int vadr)
 {
   // TODO
+    unsigned int r;
+    r = get_ptbl_entry_by_va(proc_index,vadr);
+    if(r!=0)
+    {
+        rmv_ptbl_entry_by_va(proc_index,vadr);                       //removing pte id it is valid.                
+        return r;
+    }
   return 0;
 }   

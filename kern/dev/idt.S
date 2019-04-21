@@ -133,4 +133,10 @@ _alltraps:
 .type	trap_return,@function
 .p2align 4, 0x90		/* 16-byte alignment, nop filled */
 trap_return:
-	/* TODO */
+	/* TODO */ 
+        movl	4(%esp),%esp	// reset stack pointer to point to trap frame
+	popal			// restore general-purpose registers except esp
+	popl	%es		// restore data segment registers
+	popl	%ds
+	addl	$8,%esp		// skip tf_trapno and tf_errcode
+	iret			// return from trap handler
