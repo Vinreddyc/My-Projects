@@ -71,3 +71,20 @@ unsigned int proc_create(void *elf_addr, unsigned int quota)
 
 	  return pid;
 }
+
+
+unsigned int proc_fork(void)
+{
+    unsigned int proc_id, cur_id, con_quota, used_quota, usable_quota;
+    cur_id = get_curid();
+    con_quota = container_get_quota(cur_id);
+    used_quota = container_get_usage(cur_id);
+    usable_quota = con_quota - used_quota;
+    proc_id = thread_fork((void *) proc_start_user, cur_id, usable_quota);
+    //elf_load(elf_addr, proc_id);
+
+    uctx_pool[proc_id] = uctx_pool[cur_id];
+    uctx_pool[proc_id].regs.ebx = 0;
+    
+    return proc_id;
+}

@@ -11,6 +11,7 @@ unsigned int get_ptbl_entry_by_va(unsigned int proc_index, unsigned int vaddr);
 unsigned int get_curid(void);
 void syscall_dispatch(void);
 unsigned int alloc_page(unsigned int proc_index, unsigned int vaddr, unsigned int perm);
+void map_decow( uint32_t, uint32_t);
 
 #endif /* _KERN_ */
 

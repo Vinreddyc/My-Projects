@@ -74,10 +74,19 @@ sys_yield(void)
 }
 
 static gcc_inline pid_t
+
 sys_fork(void)
 {
   //TODO
-  return -1;
+      int err_num;
+        pid_t cur_id;
+        asm volatile("int %2" 
+                     : "=a" (err_num),
+                       "=b" (cur_id)
+		     : "i" (T_SYSCALL),
+		       "a" (SYS_fork)
+		     : "cc", "memory");
+	return cur_id;
 }
 
 #endif

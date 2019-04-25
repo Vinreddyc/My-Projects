@@ -14,6 +14,8 @@ unsigned int tqueue_dequeue(unsigned int chid);
 
 unsigned int get_curid(void);
 void set_curid(unsigned int curid);
+unsigned int container_get_quota(unsigned int);
+unsigned int container_get_usage(unsigned int);
 
 #endif /* _KERN_ */
 

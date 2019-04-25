@@ -29,6 +29,7 @@ unsigned int thread_spawn(void *entry, unsigned int id, unsigned int quota)
   return 0;
 }
 
+
 /** TASK 2:
   * * Yield to the next thread in the ready queue. You should:
   *   - Set the currently running thread state as ready,
@@ -64,4 +65,15 @@ void thread_yield(void)
   } 
   else
   return;
+}
+
+
+unsigned int thread_fork(void *entry, unsigned int id, unsigned int quota)
+{
+  // TODO
+     unsigned int new_child = kctx_new(entry,id,quota/2);
+     tcb_set_state(new_child, TSTATE_READY);
+     tqueue_enqueue(NUM_IDS, new_child);
+     return new_child;
+  return 0;
 }

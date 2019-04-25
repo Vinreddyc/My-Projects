@@ -3,6 +3,7 @@
 
 unsigned int proc_create(void *elf_addr, unsigned int);
 void proc_start_user(void);
+unsigned int proc_fork(void);
 
 #endif
 

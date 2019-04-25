@@ -6,11 +6,13 @@
 unsigned int get_curid(void);
 void set_pdir_base(unsigned int);
 unsigned int thread_spawn(void *entry, unsigned int id, unsigned int quota);
+unsigned int thread_fork(void *entry, unsigned int id, unsigned int quota);
 
 unsigned int container_get_quota(unsigned int);
 unsigned int container_get_usage(unsigned int);
 
 void copy_pdir(unsigned int, unsigned int);
+void map_cow(uint32_t, uint32_t);
 
 #endif /* _KERN_ */
 

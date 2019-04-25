@@ -19,7 +19,11 @@ void syscall_set_retval4(unsigned int retval);
 void syscall_set_retval5(unsigned int retval);
 
 unsigned int proc_create(void *elf_addr, unsigned int);
+unsigned int proc_fork(void);
+unsigned int container_get_quota(unsigned int);
+unsigned int container_get_usage(unsigned int);
 void thread_yield(void);
+void map_cow(uint32_t , uint32_t);
 
 #endif /* _KERN_ */
 

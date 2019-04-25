@@ -105,6 +105,9 @@ void sys_spawn(void)
      case 3: 
             elf_ld = (unsigned int)_binary___obj_user_pingpong_ding_start;
             break;
+     case 4:
+            elf_ld = (unsigned int)_binary___obj_user_fork_fork_start;
+            break;
      default:
             syscall_set_retval1(NUM_IDS);
             syscall_set_errno(E_INVAL_PID);
@@ -155,4 +158,16 @@ void sys_yield(void)
   // TODO
      thread_yield();
      syscall_set_errno(E_SUCC);
+}
+
+
+void sys_fork(void)
+{
+	unsigned int cur_pid, child_proc_id, elf_ld;
+	cur_pid = get_curid();
+        elf_ld = (unsigned int)_binary___obj_user_fork_fork_start;
+	child_proc_id = proc_fork();
+	map_cow(cur_pid, child_proc_id);
+	syscall_set_errno(E_SUCC);
+	syscall_set_retval1(child_proc_id);	
 }
